@@ -8,7 +8,7 @@ anyhow = "1"
 async-trait = "*"
 env_logger = "0.8"
 log = "0.4"
-nom = "*"
+nom = "6"
 
 [dependencies.tokio]
 features = ["full"]
