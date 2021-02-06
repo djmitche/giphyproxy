@@ -1,4 +1,4 @@
-use crate::backend::GiphyBackend;
+use crate::backend::SingleHostBackend;
 use crate::connection::connection;
 use anyhow::Result;
 use tokio::net::TcpListener;
@@ -10,7 +10,7 @@ pub async fn listen(ip_and_port: &str) -> Result<()> {
 
     loop {
         let (socket, _) = listener.accept().await?;
-        let backend = GiphyBackend;
+        let backend = SingleHostBackend::new("api.giphy.com", 443);
 
         tokio::spawn(async move {
             if let Err(e) = connection(socket, backend).await {

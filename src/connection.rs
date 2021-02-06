@@ -69,8 +69,10 @@ where
             if n == 0 {
                 // read socket is closed; we must shut down the write half
                 // explicitly (simply dropping it is not enough, as its split
-                // half is still running)
-                write.shutdown().await?;
+                // half is still running).  We ignore an error here since an
+                // error suggests the write side is already shut (e.g., if this
+                // socket is completely closed)
+                let _ = write.shutdown().await;
                 return Ok(());
             }
 

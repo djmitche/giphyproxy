@@ -7,6 +7,7 @@ version = "0.1.0"
 anyhow = "1"
 async-trait = "*"
 env_logger = "0.8"
+httptest = "0.15"
 log = "0.4"
 nom = "*"
 
