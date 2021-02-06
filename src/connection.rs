@@ -1,7 +1,7 @@
 use crate::backend::Backend;
 use crate::http::{parse_head, ParseHeadResult};
 use anyhow::{bail, Context, Result};
-use tokio::io::{split, AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
+use tokio::io::{split, AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt, BufStream};
 
 /// Maximum size of a request head; this helps avoid abuse.  It is very low because
 /// CONNECT requests should be tiny.  This is allocated on the stack, so increases
@@ -126,12 +126,14 @@ where
 /// Handle a single client connection until it ends.  This is implemented in terms of
 /// AsyncRead and AsyncWrite, so it has no access to metadata such as the client's IP.
 pub async fn connection<S: AsyncRead + AsyncWrite + Unpin + Send + 'static, B: Backend>(
-    mut socket: S,
+    socket: S,
     backend: B,
 ) -> Result<()> {
     log::info!("Handling connection");
 
-    // TODO: wrap socket in a buffering impl so we don't read a byte at a time from the input
+    // wrap the socket in a bufer so we don't read a byte at a time from the input, but
+    // setting writer_capacity to 0 to get immediate writes
+    let mut socket = BufStream::with_capacity(8192, 0, socket);
 
     // read the HTTP request head and write the response
     let (host, port) = handle_connect(&mut socket).await?;

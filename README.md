@@ -57,8 +57,5 @@ It took me some time (and a lot of hanging tests) to discover that dropping the 
   In an operational sense, I would typically leave TLS termination to a frontend such as a load balancer.
   In the context of this assignment, getting certificates configured, test clients configured to ignore the lack of signatures, and so on would be time-consuming and less demonstrative than implementing the core service.
 
-* The implementation reading the head reads 1 byte at a time, which means a lot of syscalls.
-  https://docs.rs/tokio/1.2.0/tokio/io/struct.BufReader.html would help, but would need careful consideration to ensure any extra bytes it read after the request head were sent to the backend.
-
 * The proxy writes its `OK` response before connecting to the backend, and then drops the connection if anything goes wrong.
   This is probably adequate for a backend to an owned client, but otherwise isn't very friendly.
