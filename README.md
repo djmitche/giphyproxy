@@ -53,9 +53,11 @@ It took me some time (and a lot of hanging tests) to discover that dropping the 
 
 * The service is not currently configurable, and just uses a static listening IP and port
 
-* The assignment specifies that the service is contacted via HTTPS.
+* The exercise specifies that the service is contacted via HTTPS.
   In an operational sense, I would typically leave TLS termination to a frontend such as a load balancer.
-  In the context of this assignment, getting certificates configured, test clients configured to ignore the lack of signatures, and so on would be time-consuming and less demonstrative than implementing the core service.
+  Proper configuration and rotation of certificates and protection of keys is best handled there, and such services are generally well-hardened and configured with the approrpriate ciphers and other algorithms.
+
+  In the context of this exercise, I chose to implement a service that only services HTTP, partly for these operational reasons, and partly because doing otherwise would have distracted from the core components of the exercise.
 
 * The proxy writes its `OK` response before connecting to the backend, and then drops the connection if anything goes wrong.
   This is probably adequate for a backend to an owned client, but otherwise isn't very friendly.
