@@ -25,3 +25,20 @@ The binary accepts the following configuration:
 
 It listens on the loopback interface, on port 8080.
 This is not currently configurable.
+
+# Exercise Notes
+
+## HTTP
+
+It's been a while since I've thought about direct connect proxies.
+Rather than refresh my memory, I operated off what is in the assignment and a quick read of MDN.
+I tested this manually with `curl` to see that it was at least implementing enough of the protocol to talk to that utility:
+
+```shell
+curl --proxytunnel -x http://127.0.0.1:8080 foo.com:1234/abcd
+```
+
+In particular, this is why the HTTP parser accepts, and ignores, headers.
+
+This was a form of informal integration testing, done mainly to inform the unit tests that run automatically.
+Given more time, it would make sense to use the clients that will actually be connecting to the application as part of automated integration tests.

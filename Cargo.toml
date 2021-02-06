@@ -3,11 +3,11 @@ authors = ["Dustin J. Mitchell <dustin@mozilla.com>"]
 edition = "2018"
 name = "giphyproxy"
 version = "0.1.0"
-
 [dependencies]
 anyhow = "1"
 env_logger = "0.8"
 log = "0.4"
+nom = "*"
 
 [dependencies.tokio]
 features = ["full"]
