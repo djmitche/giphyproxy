@@ -45,8 +45,8 @@ impl Backend for SingleHostBackend {
 #[cfg(test)]
 mod test {
     use super::*;
-    use httptest::{matchers::*, responders::*, Expectation, Server};
     use tokio::io::{AsyncReadExt, AsyncWriteExt};
+    use tokio::net::TcpListener;
 
     #[tokio::test]
     async fn test_connect_check() {
@@ -57,25 +57,30 @@ mod test {
 
     #[tokio::test]
     async fn test_connect_good() {
-        let server = Server::run();
-        server.expect(
-            Expectation::matching(request::method_path("GET", "/foo"))
-                .respond_with(status_code(200)),
-        );
+        let _ = env_logger::builder().is_test(true).try_init();
 
-        let url = server.url("/foo");
-        let host = url.host().unwrap();
-        let port = url.port_u16().unwrap();
-        let backend = SingleHostBackend::new(host, port);
-        let mut stream = backend.connect(host, port).await.unwrap();
+        // a tcp server that reads HELLO and writes back WORLD on a port on localhost
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let port = listener.local_addr().unwrap().port();
+        tokio::spawn(async move {
+            let (mut socket, _) = listener.accept().await.unwrap();
 
-        stream
-            .write_all(b"GET /foo HTTP/1.0\r\n\r\n")
-            .await
-            .unwrap();
+            let mut result = vec![];
+            socket.read_to_end(&mut result).await.unwrap();
+            assert_eq!(&result, b"HELLO");
+
+            socket.write_all(b"WORLD").await.unwrap();
+            socket.shutdown().await.unwrap();
+        });
+
+        let backend = SingleHostBackend::new("127.0.0.1", port);
+        let mut stream = backend.connect("127.0.0.1", port).await.unwrap();
+
+        stream.write_all(b"HELLO").await.unwrap();
+        stream.shutdown().await.unwrap();
 
         let mut response = vec![];
         stream.read_to_end(&mut response).await.unwrap();
-        // (httptest will bail out if we did something wrong)
+        assert_eq!(&response, b"WORLD");
     }
 }

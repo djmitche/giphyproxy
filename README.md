@@ -41,7 +41,8 @@ curl --proxytunnel -x http://127.0.0.1:8080 foo.com:1234/abcd
 In particular, this is why the HTTP parser accepts, and ignores, headers.
 
 This was a form of informal integration testing, done mainly to inform the unit tests that run automatically.
-Given more time, it would make sense to use the clients that will actually be connecting to the application as part of automated integration tests.
+
+Toward the end of the work, I replaced this with an integration test in `src/main.rs` which uses the `reqwest` library to make a proxied request to Giphy.
 
 ## EOF
 
@@ -49,6 +50,8 @@ Copying bytes around is easy enough, but successfully relaying EOFs is a little 
 It took me some time (and a lot of hanging tests) to discover that dropping the `WriteHalf` of a split `TcpStream` does not half-close the socket.
 
 ## TODO
+
+* The service is not currently configurable, and just uses a static listening IP and port
 
 * The assignment specifies that the service is contacted via HTTPS.
   In an operational sense, I would typically leave TLS termination to a frontend such as a load balancer.

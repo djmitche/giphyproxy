@@ -190,7 +190,7 @@ mod test {
 
     #[tokio::test]
     async fn test_connect() {
-        env_logger::init();
+        let _ = env_logger::builder().is_test(true).try_init();
 
         let (mut client, server) = duplex(64);
         let server_task = tokio::spawn(async move {
